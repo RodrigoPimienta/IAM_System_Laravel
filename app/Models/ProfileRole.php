@@ -18,20 +18,5 @@ class ProfileRole extends Model
         "status",
     ];
 
-    public function roles(): HasMany
-    {
-        return $this->hasMany(ProfileRole::class, 'id_profile', 'id_profile')
-                    ->table ('profiles_roles')
-                    ->select(['id_module', 'id_role'])
-                    ->where('status', 1)
-                    ->with([
-                        'module' => function ($query) {
-                            $query->select('id_module', 'name as module');
-                        },
-                        'role' => function ($query) {
-                            $query->select('id_role', 'name as role');
-                        }
-                    ]);
-    }
 
 }

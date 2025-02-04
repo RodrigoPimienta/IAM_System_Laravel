@@ -21,17 +21,18 @@ class Profile extends Model
 
     public function roles(): HasMany
     {
-        return $this->hasMany(ProfileRole::class, 'id_profile', 'id_profile')
-                    ->select(['id_module', 'id_role', 'status'])
-                    ->where('status', 1)
-                    ->with([
-                        'module' => function ($query) {
-                            $query->select('id_module', 'name as module');
-                        },
-                        'role' => function ($query) {
-                            $query->select('id_role', 'name as role');
-                        }
-                    ]);
+        return $this->hasMany(ModulePermission::class, 'id_profile', 'id_profile')
+        ->table('v_profiles_roles')
+        ->select(['id_module','module', 'key_module', 'id_role', 'role','status'])
+        ->where('status', 1);
+    }
+
+    public function permissions(): HasMany
+    {
+        return $this->hasMany(ModulePermission::class, 'id_profile', 'id_profile')
+        ->table('v_profiles_permissions')
+        ->select(['id_module','module', 'key_module', 'key_permission', 'permission'])
+        ->where('status', 1);
     }
 
     

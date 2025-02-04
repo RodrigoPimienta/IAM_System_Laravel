@@ -148,11 +148,10 @@ class profileController extends Controller
         return Controller::response(200, false, $message = 'Profile updated', $profile);
     }
 
-    public function updatePartial(Request $request, int $id): object
+    public function updateStatus(Request $request, int $id): object
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'max:255',
-            'status' => 'digits:1',
+            'status' => 'required|digits:1',
         ]);
 
         if( $validator->fails() ){
@@ -164,13 +163,9 @@ class profileController extends Controller
             return Controller::response(404, true, $message = 'Profile not found');
         }
 
-        if($request->name){
-            $profile->name = $request->name;
-        }
 
-        if( $request->status){
-            $profile->status = $request->status;
-        }
+        $profile->status = $request->status;
+        
 
         $profile->save();
 
