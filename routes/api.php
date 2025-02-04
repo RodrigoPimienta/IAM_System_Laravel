@@ -11,14 +11,7 @@ use App\Http\Controllers\Api\moduleRoleController;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-
-
-Route::get('/profiles', [ProfileController::class,'all']);
-
-Route::get('/profiles/{id}', [ProfileController::class,'show']);
-
-Route::post('/profiles', [ProfileController::class,'store']);
-
+;
 
 // crear un routeGroup para los modulos /modules
 
@@ -44,4 +37,12 @@ Route::controller(moduleRoleController::class)->group(function () {
     Route::post('/modules/roles', 'store');
     Route::put('/modules/roles/{id}', 'update');
     Route::patch('modules/roles/{id}/status', 'updateStatus');
+});
+
+Route::controller(moduleController::class)->group(function () {
+    Route::get('/profiles', 'all');
+    Route::get('/profiles/{id}', 'show');
+    Route::post('/profiles', 'store');
+    Route::put('/profiles/{id}', 'update');
+    Route::patch('profiles/{id}/status', 'updateStatus');
 });
