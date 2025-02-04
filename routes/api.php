@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\profileController;
 use App\Http\Controllers\Api\moduleController;
 use App\Http\Controllers\Api\modulePermissionController;
 use App\Http\Controllers\Api\moduleRoleController;
+use App\Http\Controllers\authController;
 
 
 Route::get('/user', function (Request $request) {
@@ -39,10 +40,15 @@ Route::controller(moduleRoleController::class)->group(function () {
     Route::patch('modules/roles/{id}/status', 'updateStatus');
 });
 
-Route::controller(moduleController::class)->group(function () {
+Route::controller(profileController::class)->group(function () {
     Route::get('/profiles', 'all');
     Route::get('/profiles/{id}', 'show');
     Route::post('/profiles', 'store');
     Route::put('/profiles/{id}', 'update');
     Route::patch('profiles/{id}/status', 'updateStatus');
+});
+
+
+Route::controller(authController::class)->group(function(){
+    Route::get('/auth/permissions','allPermissions');
 });
