@@ -20,6 +20,7 @@ return new class extends Migration
 
         Schema::create('modules', function (Blueprint $table) {
             $table->id('id_module');
+            $table->string('key',50);
             $table->string('name',255);
             $table->integer('status')->default(1);
             $table->timestamps();
@@ -59,6 +60,7 @@ return new class extends Migration
             $table->unsignedBigInteger( 'id_profile');
             $table->unsignedBigInteger( 'id_module');
             $table->unsignedBigInteger( 'id_role');
+            $table->integer('status')->default(1);
             $table->timestamps();
             $table->foreign('id_profile')->references('id_profile')->on('profiles');
             $table->foreign('id_module')->references('id_module')->on('modules');
