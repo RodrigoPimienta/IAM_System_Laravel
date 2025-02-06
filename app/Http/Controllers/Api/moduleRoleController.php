@@ -27,11 +27,6 @@ class moduleRoleController extends Controller
         return Controller::response(200, false, $message='Module Role list', $roles);
     }
 
-    public function allVByModule(int $id_module): object{
-        $roles = ModuleRole::where('id_module', $id_module)->get();
-        return Controller::response(200, false, $message='Module Role list', $roles);
-    }
-
     public function store(Request $request): object{
 
         $validator = Validator::make($request->all(),[
@@ -59,10 +54,11 @@ class moduleRoleController extends Controller
         $arrayPermissions = [];
 
         foreach($request->permissions as $permission){
+            $permission = (object) $permission;
             $arrayPermissions[] = [
                 'id_role' => $moduleRole->id_role,
                 'id_permission' => $permission->id_permission,
-
+                'created_at' => now(),
             ];
         }
 
@@ -80,7 +76,7 @@ class moduleRoleController extends Controller
 
 
     public function show (int $id): object{
-        $moduleRole = ModuleRole::find($id);
+        $moduleRole = ModuleRole::find($id, $this->colums);
 
         if(! $moduleRole){
             return Controller::response(404, true, $message = 'Module Role not found');
@@ -104,7 +100,7 @@ class moduleRoleController extends Controller
         }
 
         DB::beginTransaction();
-        $moduleRole = ModuleRole::findOrFail($id);
+        $moduleRole = ModuleRole::find($id, $this->colums);
 
         if(! $moduleRole){
             DB::rollBack();
@@ -117,13 +113,12 @@ class moduleRoleController extends Controller
         }
 
         $moduleRole->name = $request->name;
-        $moduleRole->status = $request->status;
         $moduleRole->save();
 
 
         $update = ModuleRolePermission::where( 'id_role', $moduleRole->id_role)->update(['status' => 0]);
 
-        if($update){
+        if(!$update){
             DB::rollBack();
             return Controller::response(400, true, $message = 'Error updating module role permissions');
         }
@@ -132,10 +127,11 @@ class moduleRoleController extends Controller
         $arrayPermissions = [];
 
         foreach($request->permissions as $permission){
+            $permission = (object) $permission;
             $arrayPermissions[] = [
                 'id_role' => $moduleRole->id_role,
                 'id_permission' => $permission->id_permission,
-
+                'created_at' => now(),
             ];
         }
 
