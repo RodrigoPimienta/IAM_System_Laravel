@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ModulePermission;
 use Illuminate\Http\Request;
 use DB;
 use Validator;
@@ -55,6 +56,19 @@ class moduleRoleController extends Controller
 
         foreach($request->permissions as $permission){
             $permission = (object) $permission;
+
+            $permisionCheck =  ModulePermission::find($permission->id_permission);
+
+            if(! $permisionCheck){
+                DB::rollBack();
+                return Controller::response(404, true, $message = 'Permission not found', $permission);
+            }
+
+            if($permisionCheck->id_module != $request->id_module){
+                DB::rollBack();
+                return Controller::response(404, true, $message = 'Permission not foun in module', $permission);
+            }
+
             $arrayPermissions[] = [
                 'id_role' => $moduleRole->id_role,
                 'id_permission' => $permission->id_permission,
@@ -128,6 +142,19 @@ class moduleRoleController extends Controller
 
         foreach($request->permissions as $permission){
             $permission = (object) $permission;
+
+            $permisionCheck =  ModulePermission::find($permission->id_permission);
+
+            if(! $permisionCheck){
+                DB::rollBack();
+                return Controller::response(404, true, $message = 'Permission not found', $permission);
+            }
+
+            if($permisionCheck->id_module != $request->id_module){
+                DB::rollBack();
+                return Controller::response(404, true, $message = 'Permission not foun in module', $permission);
+            }
+            
             $arrayPermissions[] = [
                 'id_role' => $moduleRole->id_role,
                 'id_permission' => $permission->id_permission,
