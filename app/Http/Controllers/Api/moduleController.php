@@ -13,7 +13,7 @@ class moduleController extends Controller
 {
     //
 
-    private $colimns = [
+    private $colums = [
         'id_module',
         'name',
         'key',
@@ -25,7 +25,7 @@ class moduleController extends Controller
     }
 
     public function all(): object{
-        $modules = Module::all($this->colimns);
+        $modules = Module::all($this->colums);
         return Controller::response(200, false, $message = 'Module list', $modules);
     }
 
@@ -33,7 +33,7 @@ class moduleController extends Controller
         $validator = Validator::make($request->all(),
         [
             'name' => 'required|max:255',
-            'key' => 'required|max:255',
+            'key' => 'required|max:255|unique:modules,key',
         ]);
 
         if ($validator->fails())
@@ -50,11 +50,11 @@ class moduleController extends Controller
             return Controller::response(400, true, $message = 'Error creating module');
         }
 
-        return Controller::response(200, false, $message = 'Module created', $module);
+        return Controller::response(201, false, $message = 'Module created', $module);
     }
 
     public function show(int $id): object{
-        $module = Module::find($id, $this->colimns);
+        $module = Module::find($id, $this->colums);
         if(! $module){
             return Controller::response(404, true, $message = 'Module not found');
         }
@@ -74,7 +74,7 @@ class moduleController extends Controller
             return Controller::response(404, false, $message = 'Validation error', $validator->errors());
         }
 
-        $module = Module::find($id);
+        $module = Module::find($id, $this->colums);
         if(! $module){
             return Controller::response(404, true, $message = 'Module not found');
         }
@@ -91,7 +91,7 @@ class moduleController extends Controller
     {
         $validator = Validator::make($request->all(),
         [
-            'status'=> ['required','string','max:1'],
+            'status'=> ['required','int','in:0,1'],
         ]);
 
         if ($validator->fails())
@@ -99,7 +99,7 @@ class moduleController extends Controller
             return Controller::response(404, false, $message = 'Validation error', $validator->errors());
         }
 
-        $module = Module::find($id);
+        $module = Module::find($id, $this->colums);
         if(! $module){
             return Controller::response(404, true, $message = 'Module not found');
         }
@@ -108,5 +108,16 @@ class moduleController extends Controller
         $module->save();
 
         return Controller::response(200, false, $message = 'Module status updated', $module);
+    }
+
+    public function permissionsByModule(int $id): object
+    {
+        $permissions = Module::find($id)->permissions;
+        return Controller::response(200, false, $message = 'Module Permission list', $permissions);
+    }
+
+    public function rolesByModule(int $id): object{
+        $roles = Module::find($id)->roles;
+        return Controller::response(200, false, $message='Module Role list', $roles);
     }
 }
