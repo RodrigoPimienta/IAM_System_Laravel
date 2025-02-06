@@ -16,6 +16,7 @@ class ModuleRole extends Model
 
     protected $guarded  = ["id_role"];
     protected $fillable = [
+        'id_module',
         "name",
         "status",
     ];
@@ -43,4 +44,19 @@ class ModuleRole extends Model
             ]);
     }
 
+    public function profile (): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Profile::class,
+            'profiles_roles',
+            'id_role',
+            'id_profile'
+        )
+            ->withPivot('status')
+            ->wherePivot('status', 1)
+            ->select([
+                'profiles_roles.id_profile',
+                'profiles_roles.status',
+            ]);
+    }
 }
