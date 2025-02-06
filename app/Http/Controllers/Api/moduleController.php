@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Validator;
-use DB;
 use App\Models\Module;
 
 
@@ -30,16 +28,10 @@ class moduleController extends Controller
     }
 
     public function store(Request $request): object{
-        $validator = Validator::make($request->all(),
-        [
+        $request = (object) $request->validate([
             'name' => 'required|max:255',
             'key' => 'required|max:255|unique:modules,key',
         ]);
-
-        if ($validator->fails())
-        {
-            return Controller::response(404, false, $message = 'Validation error', $validator->errors());
-        }
 
         $module = Module::create([
             'name' => $request->name,
@@ -63,16 +55,10 @@ class moduleController extends Controller
     }
 
     public function update(Request $request, int $id): object{
-        $validator = Validator::make($request->all(),
-        [
+        $request = (object) $request->validate([
             'name' => 'required|max:255',
             'key' => 'required|max:255',
         ]);
-
-        if ($validator->fails())
-        {
-            return Controller::response(404, false, $message = 'Validation error', $validator->errors());
-        }
 
         $module = Module::find($id, $this->colums);
         if(! $module){
@@ -89,15 +75,9 @@ class moduleController extends Controller
 
     public function updateStatus(Request $request, int $id): object
     {
-        $validator = Validator::make($request->all(),
-        [
+        $request = (object) $request->validate([
             'status'=> ['required','int','in:0,1'],
         ]);
-
-        if ($validator->fails())
-        {
-            return Controller::response(404, false, $message = 'Validation error', $validator->errors());
-        }
 
         $module = Module::find($id, $this->colums);
         if(! $module){

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ModulePermission;
 use Illuminate\Http\Request;
-use Validator;
 
 class modulePermissionController extends Controller
 {
@@ -29,16 +28,11 @@ class modulePermissionController extends Controller
 
     public function store(Request $request): object
     {
-        $validator = Validator::make($request->all(),
-            [
-                'id_module' => 'required|int|exists:modules,id_module',
-                'key'       => 'required|max:255',
-                'name'      => 'required|max:255',
-            ]);
-
-        if ($validator->fails()) {
-            return Controller::response(400, false, $message = 'Validation error', $validator->errors());
-        }
+        $request = (object) $request->validate([
+            'id_module' => 'required|int|exists:modules,id_module',
+            'key'       => 'required|max:255',
+            'name'      => 'required|max:255',
+        ]);
 
         $modulePermission = ModulePermission::create([
             'id_module' => $request->id_module,
@@ -67,16 +61,11 @@ class modulePermissionController extends Controller
 
     public function update(Request $request, int $id_permission): object
     {
-        $validator = Validator::make($request->all(),
-            [
-                'id_module' => 'required|int|exists:modules,id_module',
-                'key'       => 'required|max:255',
-                'name'      => 'required|max:255',
-            ]);
-
-        if ($validator->fails()) {
-            return Controller::response(400, false, $message = 'Validation error', $validator->errors());
-        }
+        $request = (object) $request->validate([
+            'id_module' => 'required|int|exists:modules,id_module',
+            'key'       => 'required|max:255',
+            'name'      => 'required|max:255',
+        ]);
 
         $modulePermission = ModulePermission::find($id_permission, $this->colums);
 
@@ -95,15 +84,11 @@ class modulePermissionController extends Controller
         return Controller::response(200, false, $message = 'Module Permission updated', $modulePermission);
     }
 
-    public function updateStatus(Request $request, int $id_status): object{
-        $validator = Validator::make($request->all(),
-        [
+    public function updateStatus(Request $request, int $id_status): object
+    {
+        $request = (object) $request->validate([
             'status' => 'required|int|in:0,1',
         ]);
-
-        if ($validator->fails()) {
-            return Controller::response(400, false, $message = 'Validation error', $validator->errors());
-        }
 
         $modulePermission = ModulePermission::find($id_status, $this->colums);
 

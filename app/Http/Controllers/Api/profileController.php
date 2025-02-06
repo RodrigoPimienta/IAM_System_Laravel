@@ -5,9 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ModuleRole;
 use App\Models\Profile;
 use App\Models\ProfileRole;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use Validator;
 
 class profileController extends Controller
 {
@@ -32,16 +31,12 @@ class profileController extends Controller
     public function store(Request $request)
     {
 
-        $validator = Validator::make($request->all(), [
+        $request = (object) $request->validate([
             'name'              => 'required|max:255',
             'roles'             => 'nullable|array',
             'roles.*.id_module' => 'required|int|exists:modules,id_module',
             'roles.*.id_rol'    => 'int|exists:modules_roles,id_role',
         ]);
-
-        if ($validator->fails()) {
-            return Controller::response(404, false, $message = 'Validation error', $validator->errors());
-        }
 
         DB::beginTransaction();
 
@@ -110,16 +105,13 @@ class profileController extends Controller
 
     public function update(Request $request, int $id): object
     {
-        $validator = Validator::make($request->all(), [
+        $request = (object) $request->validate([
             'name'              => 'required|max:255',
             'roles'             => 'nullable|array',
             'roles.*.id_module' => 'required|int|exists:modules,id_module',
             'roles.*.id_rol'    => 'int|exists:modules_roles,id_role',
         ]);
 
-        if ($validator->fails()) {
-            return Controller::response(404, false, $message = 'Validation error', $validator->errors());
-        }
 
         $profile = Profile::find($id, $this->columns);
         if (! $profile) {
@@ -175,13 +167,9 @@ class profileController extends Controller
 
     public function updateStatus(Request $request, int $id): object
     {
-        $validator = Validator::make($request->all(), [
+        $request = (object) $request->validate([
             'status' => 'required|int|digits:1',
         ]);
-
-        if ($validator->fails()) {
-            return Controller::response(400, true, $message = 'Validation error', $validator->errors());
-        }
 
         $profile = Profile::find($id, $this->columns);
         if (! $profile) {

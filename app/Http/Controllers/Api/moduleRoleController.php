@@ -5,8 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ModulePermission;
 use Illuminate\Http\Request;
-use DB;
-use Validator;
+use Illuminate\Support\Facades\DB;
 use App\Models\ModuleRole;
 use App\Models\ModuleRolePermission;
 
@@ -30,16 +29,14 @@ class moduleRoleController extends Controller
 
     public function store(Request $request): object{
 
-        $validator = Validator::make($request->all(),[
+        $request = (object) $request->validate([
             'id_module' => 'required|int|exists:modules,id_module',
             'name'=> 'required',
             'permissions' => 'nullable|array',
             'permissions.*.id_permission' => 'required|int|exists:modules_permissions,id_permission',
         ]);
 
-        if ($validator->fails()){
-            return Controller::response(404, false, $message = 'Validation error', $validator->errors());
-        }
+
         DB::beginTransaction();
 
         $moduleRole = ModuleRole::create([
@@ -102,16 +99,13 @@ class moduleRoleController extends Controller
     }
 
     public function update(Request $request, int $id): object{
-        $validator = Validator::make($request->all(),[
+        $request = (object) $request->validate([
             'id_module' => 'required|int|exists:modules,id_module',
             'name'=> 'required',
             'permissions' => 'nullable|array',
             'permissions.*.id_permission' => 'required|int|exists:modules_permissions,id_permission',
         ]);
 
-        if ($validator->fails()){
-            return Controller::response(404, false, $message = 'Validation error', $validator->errors());
-        }
 
         DB::beginTransaction();
         $moduleRole = ModuleRole::find($id, $this->colums);
