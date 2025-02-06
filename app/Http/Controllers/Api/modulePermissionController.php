@@ -27,12 +27,6 @@ class modulePermissionController extends Controller
         return Controller::response(200, false, $message = 'Module Permission list', $modulePermissions);
     }
 
-    public function allByModule(int $id_module): object
-    {
-        $modulePermissions = ModulePermission::where('id_module', $id_module)->get($this->colums);
-        return Controller::response(200, false, $message = 'Module Permission list', $modulePermissions);
-    }
-
     public function store(Request $request): object
     {
         $validator = Validator::make($request->all(),
@@ -56,13 +50,13 @@ class modulePermissionController extends Controller
             return Controller::response(400, true, $message = 'Error creating module permission');
         }
 
-        return Controller::response(200, false, $message = 'Module Permission created', $modulePermission);
+        return Controller::response(201, false, $message = 'Module Permission created', $modulePermission);
 
     }
 
     public function show(int $id): object
     {
-        $modulePermission = ModulePermission::findOrFail($id);
+        $modulePermission = ModulePermission::find($id, $this->colums);
 
         if (! $modulePermission) {
             return Controller::response(404, true, $message = 'Module Permission not found');
@@ -84,7 +78,7 @@ class modulePermissionController extends Controller
             return Controller::response(400, false, $message = 'Validation error', $validator->errors());
         }
 
-        $modulePermission = ModulePermission::find($id_permission);
+        $modulePermission = ModulePermission::find($id_permission, $this->colums);
 
         if (! $modulePermission) {
             return Controller::response(400, true, $message = 'Module Permission not found');
@@ -111,7 +105,7 @@ class modulePermissionController extends Controller
             return Controller::response(400, false, $message = 'Validation error', $validator->errors());
         }
 
-        $modulePermission = ModulePermission::find($id_status);
+        $modulePermission = ModulePermission::find($id_status, $this->colums);
 
         if (! $modulePermission) {
             return Controller::response(400, true, $message = 'Module Permission not found');
