@@ -25,4 +25,22 @@ class ModuleRole extends Model
         return $this->BelongsTo(Module::class, 'id_module', 'id_module');
     }
 
+    public function permissions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ModulePermission::class,
+            'modules_roles_permissions',
+            'id_role',
+            'id_permission'
+        )
+            ->withPivot('status')
+            ->wherePivot('status', 1)
+            ->select([
+                'modules_permissions.id_permission',
+                'modules_permissions.key as permission_key',
+                'modules_permissions.name as permission',
+                'modules_roles_permissions.status',
+            ]);
+    }
+
 }
