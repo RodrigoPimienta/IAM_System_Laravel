@@ -79,11 +79,14 @@ class userController extends Controller implements HasMiddleware
 
     public function show(int $id): object
     {
-        $user = User::with('profile')->find($id, $this->columns);
+        $user = User::find($id, $this->columns);
+//dd($user->profile);
 
         if (! $user) {
             return Controller::response(404, true, $message = 'User not found');
         }
+
+        $user->load('profile');
 
         return Controller::response(200, false, $message = 'User found', $user);
     }

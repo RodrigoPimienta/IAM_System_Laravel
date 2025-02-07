@@ -65,4 +65,14 @@ class AuthController extends Controller
         return Controller::response(200, false, $message = 'Logout');
 
     }
+
+    public function permissions(Request $request)
+    {
+        $user = $request->user()->select('id', 'name', 'email', 'status')->first();
+        $user->permissions = $user->permissions()->get();
+        $user->access = $user->getAccess();
+        unset($user->permissions);
+
+        return Controller::response(200, false, $message = 'Permissions', $user);
+    }
 }
