@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('first_last_name')->nullable();
             $table->string('second_last_name')->nullable();
-            $table->string('status')->default('active'); // Valor por defecto
-            $table->foreignId('id_profile')->nullable()->constrained('profiles')->onDelete('set null'); // Relación con tabla profiles
+            $table->string('status')->default(1); // Valor por defecto
         });
     }
 

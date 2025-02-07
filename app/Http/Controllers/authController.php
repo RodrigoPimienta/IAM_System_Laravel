@@ -7,6 +7,28 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
+    public function register(Request $request):object {
+        $request = (object) $request->validate([
+            'name' => 'required|max:255',
+            "email"    => "required|email|unique:users",
+            'password' => 'required|confirmed',
+            'password_confirmation' => 'required',
+        ]);
+
+        $user = User::create([
+            'name'=> $request->name,
+            'email'=> $request->email,
+            'password'=> bcrypt($request->password),
+            'created_at'=> now(),
+        ]);
+
+        if(! $user){
+            return Controller::response(400, true, $message = 'Error creating user');
+        }
+
+        return Controller::response(200, true, $message='User created', $user);
+    }
+
     public function login(Request $request)
     {
 
@@ -15,10 +37,10 @@ class AuthController extends Controller
             'password' => 'required|confirmed',
         ]);
 
-        $user = User::where('email', $request->email)->select('name','email')->first();
+        $user = User::where('email', $request->email)->first();
 
 
-        if(!$user || Hash::check($request->password, $user->password)) {
+        if(!$user || Hash::check($request->password, $user->password) == false){
             return Controller::response(401, true, $message = 'Provided credentials are incorrect.');
         }
 
