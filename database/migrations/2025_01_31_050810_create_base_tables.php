@@ -67,15 +67,6 @@ return new class extends Migration
             $table->foreign('id_role')->references('id_role')->on('modules_roles');
         });
 
-        Schema::create('profiles_users', function (Blueprint $table) {
-            $table->id('id_profile_user');
-            $table->unsignedBigInteger( 'id_profile');
-            $table->unsignedBigInteger( 'id_user');
-            $table->integer('status')->default(1);
-            $table->timestamps();
-            $table->foreign('id_profile')->references('id_profile')->on('profiles');
-            $table->foreign('id_user')->references('id_user')->on('users');
-        });
     }
 
     /**
