@@ -5,11 +5,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Module;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-
-class moduleController extends Controller
+class moduleController extends Controller implements HasMiddleware
 {
-    //
+
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum', except: [''])
+        ];
+    }
 
     private $colums = [
         'id_module',

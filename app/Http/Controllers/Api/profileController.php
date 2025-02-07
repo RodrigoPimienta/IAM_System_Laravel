@@ -7,9 +7,16 @@ use App\Models\Profile;
 use App\Models\ProfileRole;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 class profileController extends Controller
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum', except: [''])
+        ];
+    }
 
     private $columns = [
         'id_profile',

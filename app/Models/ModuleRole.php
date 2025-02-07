@@ -5,10 +5,11 @@ use Carbon\Traits\LocalFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Laravel\Sanctum\HasApiTokens;
 
 class ModuleRole extends Model
 {
-    use LocalFactory;
+    use LocalFactory, HasApiTokens;
 
     protected $table = "modules_roles";
 

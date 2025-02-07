@@ -8,9 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\ModuleRole;
 use App\Models\ModuleRolePermission;
-
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 class moduleRoleController extends Controller
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum', except: [''])
+        ];
+    }
     private $colums = [
         'id_role',
         'id_module',

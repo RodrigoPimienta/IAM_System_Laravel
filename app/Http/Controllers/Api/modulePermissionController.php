@@ -4,9 +4,18 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ModulePermission;
 use Illuminate\Http\Request;
-
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 class modulePermissionController extends Controller
 {
+
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum', except: [''])
+        ];
+    }
+
     private $colums = [
         'id_permission',
         'id_module',
