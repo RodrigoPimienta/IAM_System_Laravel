@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -57,5 +58,46 @@ class User extends Authenticatable
                 'profiles.status',
             ]);
     }
+
+    public function permissions()
+    {
+        return DB::table('profiles_users')
+            ->join('profiles_roles', 'profiles_roles.id_profile', '=', 'profiles_users.id_profile')
+            ->join('modules_roles_permissions', 'modules_roles_permissions.id_role', '=', 'profiles_roles.id_role')
+            ->join('modules_permissions', 'modules_permissions.id_permission', '=', 'modules_roles_permissions.id_permission')
+            ->join('modules_roles', 'modules_roles.id_role', '=', 'modules_roles_permissions.id_role')
+            ->join('modules', 'modules.id_module', '=', 'modules_permissions.id_module')
+            ->where('profiles_users.id_user', $this->id)
+            ->where('profiles_users.status', 1)
+            ->where('profiles_roles.status', 1)
+            ->where('modules_roles_permissions.status', 1)
+            ->where('modules_permissions.status', 1)
+            ->where('modules_roles.status', 1)
+            ->where('modules.status', 1)
+            ->select([
+                'modules.name as module',
+                'modules.key as module_key',
+                'modules_permissions.key',
+                'modules_permissions.name as permission',
+            ]);
+    }
+
+    public function getAccess()
+    {
+        if ($this->permissions->isEmpty()) {
+            return [];
+        }
+        
+        return $this->permissions->groupBy('module_key')->map(function ($permissions, $moduleKey) {
+            return [
+                'name' => $permissions->first()->module,
+                'permissions' => $permissions->map(fn($perm) => [
+                    'key' => $perm->key,
+                    'permission' => $perm->permission
+                ])->values()
+            ];
+        });
+    }
+    
 
 }
