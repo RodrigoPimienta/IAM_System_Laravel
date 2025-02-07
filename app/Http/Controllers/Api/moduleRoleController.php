@@ -10,7 +10,7 @@ use App\Models\ModuleRole;
 use App\Models\ModuleRolePermission;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-class moduleRoleController extends Controller
+class moduleRoleController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {

@@ -6,7 +6,7 @@ use App\Models\ModulePermission;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-class modulePermissionController extends Controller
+class modulePermissionController extends Controller implements HasMiddleware
 {
 
     public static function middleware()

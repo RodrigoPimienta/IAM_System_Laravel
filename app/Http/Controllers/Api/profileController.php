@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-class profileController extends Controller
+class profileController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
