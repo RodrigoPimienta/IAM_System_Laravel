@@ -49,9 +49,13 @@ class User extends Authenticatable
 
     public function profile(): BelongsToMany
     {
-        // un usuario tiene un perfil
-        return $this->belongsToMany(Profile::class,'profiles_users','id_user','id_profile')
+        return $this->belongsToMany(Profile::class, 'profiles_users', 'id_user', 'id_profile')
             ->withPivot('status')
-            ->withTimestamps();
+            ->select([
+                'profiles.id_profile',
+                'profiles.name as profile',
+                'profiles.status',
+            ]);
     }
+
 }

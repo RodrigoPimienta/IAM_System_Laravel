@@ -42,7 +42,7 @@ class profileController extends Controller implements HasMiddleware
             'name'              => 'required|max:255',
             'roles'             => 'nullable|array',
             'roles.*.id_module' => 'required|int|exists:modules,id_module',
-            'roles.*.id_rol'    => 'int|exists:modules_roles,id_role',
+            'roles.*.id_role'    => 'required|int|exists:modules_roles,id_role',
         ]);
 
         DB::beginTransaction();

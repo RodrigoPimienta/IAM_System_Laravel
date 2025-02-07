@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class userController extends Controller implements HasMiddleware
 {
@@ -24,7 +25,7 @@ class userController extends Controller implements HasMiddleware
     }
 
     private $columns = [
-        'id_user',
+        'id',
         'name',
         'email',
         'status',
@@ -78,12 +79,11 @@ class userController extends Controller implements HasMiddleware
 
     public function show(int $id): object
     {
-        $user = User::find($id, $this->columns);
+        $user = User::with('profile')->find($id, $this->columns);
+
         if (! $user) {
             return Controller::response(404, true, $message = 'User not found');
         }
-
-        $user->load('profile');
 
         return Controller::response(200, false, $message = 'User found', $user);
     }
@@ -91,8 +91,12 @@ class userController extends Controller implements HasMiddleware
     public function update(Request $request, int $id): object
     {
         $request = (object) $request->validate([
-            'name'  => 'required|max:255',
-            "email" => "required|email|unique:users",
+            'name'       => 'required|max:255',
+            'email'      => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($id),
+            ],
             'id_profile' => 'nullable|int|exists:profiles,id_profile',
         ]);
 
@@ -116,7 +120,7 @@ class userController extends Controller implements HasMiddleware
 
         $update = ProfileUser::where('id_user', $user->id_user)->update(['status' => 0]);
 
-        if (! $update) {
+        if ($update === false) {
             DB::rollBack();
             return Controller::response(400, true, $message = 'Error updating user profile');
         }
@@ -124,7 +128,7 @@ class userController extends Controller implements HasMiddleware
         // create profile
         $profileUser = ProfileUser::create([
             'id_profile' => $request->id_profile,
-            'id_user'    => $user->id_user,
+            'id_user'    => $id,
             'created_at' => now(),
         ]);
 
@@ -160,6 +164,12 @@ class userController extends Controller implements HasMiddleware
 
     public function updatePassword(Request $request, int $id): object
     {
+        $authenticatedUser = $request->user();
+        if ($authenticatedUser->id_user != $id) {
+            return Controller::response(403, true, $message = 'Unauthorized user');
+        }
+
+        // if (!$authenticatedUse
         $request = (object) $request->validate([
             'password'              => 'required|confirmed',
             'password_confirmation' => 'required',
