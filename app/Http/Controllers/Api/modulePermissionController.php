@@ -93,13 +93,13 @@ class modulePermissionController extends Controller implements HasMiddleware
         return Controller::response(200, false, $message = 'Module Permission updated', $modulePermission);
     }
 
-    public function updateStatus(Request $request, int $id_status): object
+    public function updateStatus(Request $request, int $id): object
     {
         $request = (object) $request->validate([
             'status' => 'required|int|in:0,1',
         ]);
 
-        $modulePermission = ModulePermission::find($id_status, $this->colums);
+        $modulePermission = ModulePermission::find($id, $this->colums);
 
         if (! $modulePermission) {
             return Controller::response(400, true, $message = 'Module Permission not found');

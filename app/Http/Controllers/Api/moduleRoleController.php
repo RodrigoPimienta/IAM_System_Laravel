@@ -1,21 +1,21 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ModulePermission;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Models\ModuleRole;
 use App\Models\ModuleRolePermission;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\DB;
+
 class moduleRoleController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
         return [
-            new Middleware('auth:sanctum', except: [''])
+            new Middleware('auth:sanctum', except: ['']),
         ];
     }
     private $colums = [
@@ -25,104 +25,106 @@ class moduleRoleController extends Controller implements HasMiddleware
         'status',
     ];
 
-    public function index(){
+    public function index()
+    {
         return 'ok';
     }
 
-    public function all(): object{
+    public function all(): object
+    {
         $roles = ModuleRole::all();
-        return Controller::response(200, false, $message='Module Role list', $roles);
+        return Controller::response(200, false, $message = 'Module Role list', $roles);
     }
 
-    public function store(Request $request): object{
+    public function store(Request $request): object
+    {
 
         $request = (object) $request->validate([
-            'id_module' => 'required|int|exists:modules,id_module',
-            'name'=> 'required',
-            'permissions' => 'nullable|array',
+            'id_module'                   => 'required|int|exists:modules,id_module',
+            'name'                        => 'required',
+            'permissions'                 => 'nullable|array',
             'permissions.*.id_permission' => 'required|int|exists:modules_permissions,id_permission',
         ]);
-
 
         DB::beginTransaction();
 
         $moduleRole = ModuleRole::create([
             'id_module' => $request->id_module,
-            'name'=> $request->name,
+            'name'      => $request->name,
         ]);
 
-        if(! $moduleRole){
+        if (! $moduleRole) {
             DB::rollBack();
             return Controller::response(400, true, $message = 'Error creating module role');
         }
 
         $arrayPermissions = [];
 
-        foreach($request->permissions as $permission){
+        foreach ($request->permissions as $permission) {
             $permission = (object) $permission;
 
-            $permisionCheck =  ModulePermission::find($permission->id_permission);
+            $permisionCheck = ModulePermission::find($permission->id_permission);
 
-            if(! $permisionCheck){
+            if (! $permisionCheck) {
                 DB::rollBack();
                 return Controller::response(404, true, $message = 'Permission not found', $permission);
             }
 
-            if($permisionCheck->id_module != $request->id_module){
+            if ($permisionCheck->id_module != $request->id_module) {
                 DB::rollBack();
                 return Controller::response(404, true, $message = 'Permission not foun in module', $permission);
             }
 
             $arrayPermissions[] = [
-                'id_role' => $moduleRole->id_role,
+                'id_role'       => $moduleRole->id_role,
                 'id_permission' => $permission->id_permission,
-                'created_at' => now(),
+                'created_at'    => now(),
             ];
         }
 
         $insertPermissions = ModuleRolePermission::insert($arrayPermissions);
 
-        if(! $insertPermissions){
+        if (! $insertPermissions) {
             DB::rollBack();
             return Controller::response(400, true, $message = 'Error creating module role permissions');
         }
 
         DB::commit();
-        return Controller::response(200, true, $message='Module Role created', $moduleRole);
+        return Controller::response(200, true, $message = 'Module Role created', $moduleRole);
 
     }
 
-
-    public function show (int $id): object{
+    public function show(int $id): object
+    {
         $moduleRole = ModuleRole::find($id, $this->colums);
 
-        if(! $moduleRole){
+        if (! $moduleRole) {
             return Controller::response(404, true, $message = 'Module Role not found');
         }
 
         $moduleRole->load('permissions');
 
-        return Controller::response(200, false, $message='Module Role found', $moduleRole);
+        return Controller::response(200, false, $message = 'Module Role found', $moduleRole);
     }
 
-    public function update(Request $request, int $id): object{
+    public function update(Request $request, int $id): object
+    {
         $request = (object) $request->validate([
-            'id_module' => 'required|int|exists:modules,id_module',
-            'name'=> 'required',
-            'permissions' => 'nullable|array',
+            'id_module'                   => 'required|int|exists:modules,id_module',
+            'name'                        => 'required',
+            'permissions'                 => 'nullable|array',
             'permissions.*.id_permission' => 'required|int|exists:modules_permissions,id_permission',
         ]);
-
 
         DB::beginTransaction();
         $moduleRole = ModuleRole::find($id, $this->colums);
 
-        if(! $moduleRole){
+        if (! $moduleRole) {
             DB::rollBack();
             return Controller::response(404, true, $message = 'Module Role not found');
         }
 
-        if($moduleRole->id_module != $request->id_module){
+        if ($moduleRole->id_module != $request->id_module) {
             DB::rollBack();
             return Controller::response(404, true, $message = 'Module Role not found');
         }
@@ -130,49 +132,67 @@ class moduleRoleController extends Controller implements HasMiddleware
         $moduleRole->name = $request->name;
         $moduleRole->save();
 
+        $update = ModuleRolePermission::where('id_role', $moduleRole->id_role)->update(['status' => 0]);
 
-        $update = ModuleRolePermission::where( 'id_role', $moduleRole->id_role)->update(['status' => 0]);
-
-        if(!$update){
+        if (! $update) {
             DB::rollBack();
             return Controller::response(400, true, $message = 'Error updating module role permissions');
         }
 
-
         $arrayPermissions = [];
 
-        foreach($request->permissions as $permission){
+        foreach ($request->permissions as $permission) {
             $permission = (object) $permission;
 
-            $permisionCheck =  ModulePermission::find($permission->id_permission);
+            $permisionCheck = ModulePermission::find($permission->id_permission);
 
-            if(! $permisionCheck){
+            if (! $permisionCheck) {
                 DB::rollBack();
                 return Controller::response(404, true, $message = 'Permission not found', $permission);
             }
 
-            if($permisionCheck->id_module != $request->id_module){
+            if ($permisionCheck->id_module != $request->id_module) {
                 DB::rollBack();
                 return Controller::response(404, true, $message = 'Permission not foun in module', $permission);
             }
-            
+
             $arrayPermissions[] = [
-                'id_role' => $moduleRole->id_role,
+                'id_role'       => $moduleRole->id_role,
                 'id_permission' => $permission->id_permission,
-                'created_at' => now(),
+                'created_at'    => now(),
             ];
         }
 
         $insertPermissions = ModuleRolePermission::insert($arrayPermissions);
 
-        if(! $insertPermissions){
+        if (! $insertPermissions) {
             DB::rollBack();
             return Controller::response(400, true, $message = 'Error creating module role permissions');
         }
 
         DB::commit();
 
-        return Controller::response(200, true, $message= 'Module Role updated', $moduleRole);
+        return Controller::response(200, true, $message = 'Module Role updated', $moduleRole);
+    }
+
+    public function updateStatus(Request $request, int $id): object
+    {
+
+        $request = (object) $request->validate([
+            'status' => 'required|int|in:0,1',
+        ]);
+
+        $role = ModuleRole::find($id, $this->colums);
+
+        if (! $role) {
+            return Controller::response(404, true, $message = 'Module Role not found');
+        }
+
+        $role->status = $request->status;
+        $role->save();
+
+        return Controller::response(200, false, $message = 'Module role status updated', $role);
+
     }
 
 }
