@@ -7,28 +7,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request):object {
-        $request = (object) $request->validate([
-            'name' => 'required|max:255',
-            "email"    => "required|email|unique:users",
-            'password' => 'required|confirmed',
-            'password_confirmation' => 'required',
-        ]);
-
-        $user = User::create([
-            'name'=> $request->name,
-            'email'=> $request->email,
-            'password'=> bcrypt($request->password),
-            'created_at'=> now(),
-        ]);
-
-        if(! $user){
-            return Controller::response(400, true, $message = 'Error creating user');
-        }
-
-        return Controller::response(200, true, $message='User created', $user);
-    }
-
     public function login(Request $request)
     {
 
@@ -51,8 +29,8 @@ class AuthController extends Controller
 
         // delete all tokens
         $user->tokens()->delete();
-
-        $token = $user->createToken($user->email);
+        $expiration = now()->addMinutes(config('sanctum.expiration'));
+        $token = $user->createToken($user->email,['*'], $expiration);
         $user->token = $token->plainTextToken;
 
         return Controller::response(200, true, $message = 'Login', $user);
