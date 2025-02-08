@@ -67,6 +67,7 @@ class User extends Authenticatable
             ->join('modules_permissions', 'modules_permissions.id_permission', '=', 'modules_roles_permissions.id_permission')
             ->join('modules_roles', 'modules_roles.id_role', '=', 'modules_roles_permissions.id_role')
             ->join('modules', 'modules.id_module', '=', 'modules_permissions.id_module')
+            ->join('profiles', 'profiles.id_profile', '=', 'profiles_users.id_profile')
             ->where('profiles_users.id_user', $this->id)
             ->where('profiles_users.status', 1)
             ->where('profiles_roles.status', 1)
@@ -74,6 +75,7 @@ class User extends Authenticatable
             ->where('modules_permissions.status', 1)
             ->where('modules_roles.status', 1)
             ->where('modules.status', 1)
+            ->where('profiles.status', 1)
             ->select([
                 'modules.name as module',
                 'modules.key as module_key',
@@ -81,23 +83,22 @@ class User extends Authenticatable
                 'modules_permissions.name as permission',
             ]);
     }
-
-    public function getAccess()
+    public function getAccess(): array
     {
         if ($this->permissions->isEmpty()) {
             return [];
         }
-        
-        return $this->permissions->groupBy('module_key')->map(function ($permissions, $moduleKey) {
+    
+        return $this->permissions->groupBy('module_key')->mapWithKeys(function ($permissions, $moduleKey) {
             return [
-                'name' => $permissions->first()->module,
-                'permissions' => $permissions->map(fn($perm) => [
-                    'key' => $perm->key,
-                    'permission' => $perm->permission
-                ])->values()
+                $moduleKey => [
+                    'name' => $permissions->first()->module,
+                    'permissions' => $permissions->pluck('permission', 'key')->toArray()
+                ]
             ];
-        });
+        })->toArray(); // Convertimos el resultado en un array puro
     }
+    
     
 
 }
