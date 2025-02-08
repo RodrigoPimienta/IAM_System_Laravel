@@ -31,11 +31,92 @@ class userController extends Controller implements HasMiddleware
         'status',
     ];
 
+/**
+ * @OA\Get(
+ *     path="/api/users",
+ *     tags={"Users"},
+ *     summary="Get list of users",
+ *     description="Returns list of users",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Successful operation",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="User list"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="name", type="string", example="John Doe"),
+ *                     @OA\Property(property="email", type="string", example="john.doe@example.com"),
+ *                     @OA\Property(property="status", type="integer", example=1)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad request",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Bad request"),
+ *             @OA\Property(property="message", type="string", example="Invalid input data"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
+
     public function all(): object
     {
         $users = User::all($this->columns);
         return Controller::response(200, false, $message = 'User list', $users);
     }
+
+/**
+ * @OA\Post(
+ *     path="/api/users",
+ *     tags={"Users"},
+ *     summary="Create a new user",
+ *     description="Creates a new user and assigns a profile",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="name", type="string", example="John Doe"),
+ *             @OA\Property(property="email", type="string", example="john.doe@example.com"),
+ *             @OA\Property(property="password", type="string", example="password123"),
+ *             @OA\Property(property="password_confirmation", type="string", example="password123"),
+ *             @OA\Property(property="id_profile", type="integer", example=1)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User created",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="User created"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="John Doe"),
+ *                 @OA\Property(property="email", type="string", example="john.doe@example.com"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad request",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Bad request"),
+ *             @OA\Property(property="message", type="string", example="Error creating user"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
+
 
     public function store(Request $request): object
     {
@@ -77,6 +158,47 @@ class userController extends Controller implements HasMiddleware
         return Controller::response(200, true, $message = 'User created', $user);
     }
 
+/**
+ * @OA\Get(
+ *     path="/api/users/{id}",
+ *     tags={"Users"},
+ *     summary="Get user details",
+ *     description="Returns the details of a specific user",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="User found"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="John Doe"),
+ *                 @OA\Property(property="email", type="string", example="john.doe@example.com"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not Found"),
+ *             @OA\Property(property="message", type="string", example="User not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
+
+
     public function show(int $id): object
     {
         $user = User::find($id, $this->columns);
@@ -90,6 +212,55 @@ class userController extends Controller implements HasMiddleware
 
         return Controller::response(200, false, $message = 'User found', $user);
     }
+
+   /**
+ * @OA\Put(
+ *     path="/api/users/{id}",
+ *     tags={"Users"},
+ *     summary="Update user information",
+ *     description="Updates the user's details",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="name", type="string", example="John Doe Updated"),
+ *             @OA\Property(property="email", type="string", example="john.doe.updated@example.com"),
+ *             @OA\Property(property="id_profile", type="integer", example=2)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User updated",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="User updated"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="John Doe Updated"),
+ *                 @OA\Property(property="email", type="string", example="john.doe.updated@example.com"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not Found"),
+ *             @OA\Property(property="message", type="string", example="User not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
+
 
     public function update(Request $request, int $id): object
     {
@@ -144,6 +315,51 @@ class userController extends Controller implements HasMiddleware
         return Controller::response(200, false, $message = 'User updated', $user);
     }
 
+   /**
+ * @OA\Patch(
+ *     path="/api/users/{id}/status",
+ *     tags={"Users"},
+ *     summary="Update user status",
+ *     description="Updates the user's status (active/inactive)",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer", example=1)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User status updated",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="User status updated"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not Found"),
+ *             @OA\Property(property="message", type="string", example="User not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
+
+
     public function updateStatus(Request $request, int $id): object
     {
         $request = (object) $request->validate([
@@ -164,6 +380,53 @@ class userController extends Controller implements HasMiddleware
 
         return Controller::response(200, false, $message = 'User status updated', $user);
     }
+
+  /**
+ * @OA\Patch(
+ *     path="/api/users/{id}/password",
+ *     tags={"Users"},
+ *     summary="Update user password",
+ *     description="Updates the user's password",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="password", type="string", example="newpassword123"),
+ *             @OA\Property(property="password_confirmation", type="string", example="newpassword123")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User password updated",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="User password updated"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="John Doe"),
+ *                 @OA\Property(property="email", type="string", example="john.doe@example.com"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="User not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not Found"),
+ *             @OA\Property(property="message", type="string", example="User not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
 
     public function updatePassword(Request $request, int $id): object
     {

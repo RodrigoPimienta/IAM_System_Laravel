@@ -28,12 +28,93 @@ class profileController extends Controller implements HasMiddleware
     {
         return 'ok';
     }
+    /**
+ * @OA\Get(
+ *     path="/api/profiles",
+ *     tags={"Profiles"},
+ *     summary="Get list of profiles",
+ *     description="Returns a list of all profiles",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile list",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Profile list"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id_profile", type="integer", example=1),
+ *                     @OA\Property(property="name", type="string", example="Admin"),
+ *                     @OA\Property(property="status", type="integer", example=1)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad request",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Bad request"),
+ *             @OA\Property(property="message", type="string", example="Error fetching profiles"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
 
     public function all()
     {
         $profiles = Profile::all($this->columns);
         return Controller::response(200, false, $message = 'Profile list', $profiles);
     }
+    /**
+ * @OA\Post(
+ *     path="/api/profiles",
+ *     tags={"Profiles"},
+ *     summary="Create a new profile",
+ *     description="Creates a new profile with associated roles",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"name"},
+ *             @OA\Property(property="name", type="string", example="Admin"),
+ *             @OA\Property(
+ *                 property="roles",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id_module", type="integer", example=1),
+ *                     @OA\Property(property="id_role", type="integer", example=2)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile created successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Profile created"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id_profile", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="Admin"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Bad request",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Bad request"),
+ *             @OA\Property(property="message", type="string", example="Error creating profile"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
 
     public function store(Request $request)
     {
@@ -94,7 +175,53 @@ class profileController extends Controller implements HasMiddleware
         DB::commit();
         return Controller::response(200, true, $message = 'Profile created', $profile);
     }
-
+/**
+ * @OA\Get(
+ *     path="/api/profiles/{id}",
+ *     tags={"Profiles"},
+ *     summary="Get a profile by ID",
+ *     description="Returns a profile by its ID, along with related roles",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the profile to retrieve",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Profile found"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id_profile", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="Admin"),
+ *                 @OA\Property(property="status", type="integer", example=1),
+ *                 @OA\Property(
+ *                     property="roles",
+ *                     type="array",
+ *                     @OA\Items(
+ *                         @OA\Property(property="id_role", type="integer", example=2),
+ *                         @OA\Property(property="id_module", type="integer", example=1)
+ *                     )
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Profile not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not found"),
+ *             @OA\Property(property="message", type="string", example="Profile not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
     public function show(int $id): object
     {
 
@@ -110,6 +237,60 @@ class profileController extends Controller implements HasMiddleware
         return Controller::response(200, false, $message = 'Profile found', $profile);
     }
 
+    /**
+ * @OA\Put(
+ *     path="/api/profiles/{id}",
+ *     tags={"Profiles"},
+ *     summary="Update a profile",
+ *     description="Updates an existing profile with new name and roles",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the profile to update",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"name"},
+ *             @OA\Property(property="name", type="string", example="Admin"),
+ *             @OA\Property(
+ *                 property="roles",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id_module", type="integer", example=1),
+ *                     @OA\Property(property="id_role", type="integer", example=2)
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile updated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Profile updated"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id_profile", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="Admin"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Profile not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not found"),
+ *             @OA\Property(property="message", type="string", example="Profile not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
     public function update(Request $request, int $id): object
     {
         $request = (object) $request->validate([
@@ -172,6 +353,52 @@ class profileController extends Controller implements HasMiddleware
         return Controller::response(200, false, $message = 'Profile updated', $profile);
     }
 
+    /**
+ * @OA\Patch(
+ *     path="/api/profiles/{id}/status",
+ *     tags={"Profiles"},
+ *     summary="Update profile status",
+ *     description="Updates the status of a profile",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="ID of the profile to update status",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             required={"status"},
+ *             @OA\Property(property="status", type="integer", example=1)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profile status updated successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Profile updated"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id_profile", type="integer", example=1),
+ *                 @OA\Property(property="name", type="string", example="Admin"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Profile not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not found"),
+ *             @OA\Property(property="message", type="string", example="Profile not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
     public function updateStatus(Request $request, int $id): object
     {
         $request = (object) $request->validate([

@@ -27,14 +27,77 @@ class modulePermissionController extends Controller implements HasMiddleware
     public function index()
     {
         return 'ok';
-    }
+    } 
 
+    /**
+ * @OA\Get(
+ *     path="/api/modules/permissions",
+ *     tags={"Module permissions"},
+ *     summary="Get all module permissions",
+ *     description="Returns a list of all module permissions",
+ *     @OA\Response(
+ *         response=200,
+ *         description="Module permissions found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Module Permission list"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     @OA\Property(property="id", type="integer", example=1),
+ *                     @OA\Property(property="key", type="string", example="permission_key"),
+ *                     @OA\Property(property="name", type="string", example="Permission Name")
+ *                 )
+ *             )
+ *         )
+ *     )
+ * )
+ */
     public function all(): object
     {
         $modulePermissions = ModulePermission::all($this->colums);
         return Controller::response(200, false, $message = 'Module Permission list', $modulePermissions);
     }
-
+/**
+ * @OA\Post(
+ *     path="/api/modules/permissions",
+ *     tags={"Module permissions"},
+ *     summary="Create a new module permission",
+ *     description="Creates a new permission for a specific module",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="id_module", type="integer", example=1),
+ *             @OA\Property(property="key", type="string", example="new_permission_key"),
+ *             @OA\Property(property="name", type="string", example="New Permission")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Module Permission created",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Module Permission created"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="key", type="string", example="new_permission_key"),
+ *                 @OA\Property(property="name", type="string", example="New Permission")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Error creating module permission",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Error"),
+ *             @OA\Property(property="message", type="string", example="Error creating module permission")
+ *         )
+ *     )
+ * )
+ */
     public function store(Request $request): object
     {
         $request = (object) $request->validate([
@@ -57,6 +120,44 @@ class modulePermissionController extends Controller implements HasMiddleware
 
     }
 
+    /**
+ * @OA\Get(
+ *     path="/api/modules/permissions/{id}",
+ *     tags={"Module permissions"},
+ *     summary="Get a specific module permission",
+ *     description="Returns the details of a specific module permission",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Module permission found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Module Permission found"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="key", type="string", example="permission_key"),
+ *                 @OA\Property(property="name", type="string", example="Permission Name")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Module Permission not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Not Found"),
+ *             @OA\Property(property="message", type="string", example="Module Permission not found"),
+ *             @OA\Property(property="data", type="null")
+ *         )
+ *     )
+ * )
+ */
     public function show(int $id): object
     {
         $modulePermission = ModulePermission::find($id, $this->colums);
@@ -67,6 +168,51 @@ class modulePermissionController extends Controller implements HasMiddleware
 
         return Controller::response(200, false, $message = 'Module Permission found', $modulePermission);
     }
+    /**
+ * @OA\Put(
+ *     path="/api/modules/permissions/{id}",
+ *     tags={"Module permissions"},
+ *     summary="Update a module permission",
+ *     description="Updates an existing module permission",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="id_module", type="integer", example=1),
+ *             @OA\Property(property="key", type="string", example="updated_permission_key"),
+ *             @OA\Property(property="name", type="string", example="Updated Permission")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Module Permission updated",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Module Permission updated"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="key", type="string", example="updated_permission_key"),
+ *                 @OA\Property(property="name", type="string", example="Updated Permission")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Module Permission not found or error",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Error"),
+ *             @OA\Property(property="message", type="string", example="Module Permission not found")
+ *         )
+ *     )
+ * )
+ */
 
     public function update(Request $request, int $id_permission): object
     {
@@ -92,6 +238,50 @@ class modulePermissionController extends Controller implements HasMiddleware
 
         return Controller::response(200, false, $message = 'Module Permission updated', $modulePermission);
     }
+    /**
+ * @OA\Patch(
+ *     path="/api/modules/permissions/{id}/status",
+ *     tags={"Module permissions"},
+ *     summary="Update status of a module permission",
+ *     description="Updates the status of a specific module permission",
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         @OA\Schema(type="integer", example=1)
+ *     ),
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\JsonContent(
+ *             @OA\Property(property="status", type="integer", example=1)
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Module Permission status updated",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example=""),
+ *             @OA\Property(property="message", type="string", example="Module Permission status updated"),
+ *             @OA\Property(
+ *                 property="data",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="key", type="string", example="permission_key"),
+ *                 @OA\Property(property="name", type="string", example="Permission Name"),
+ *                 @OA\Property(property="status", type="integer", example=1)
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Module Permission not found",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="error", type="string", example="Error"),
+ *             @OA\Property(property="message", type="string", example="Module Permission not found")
+ *         )
+ *     )
+ * )
+ */
 
     public function updateStatus(Request $request, int $id): object
     {
