@@ -59,7 +59,7 @@ class AuthController extends Controller
             'password' => 'required|confirmed',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first(['id', 'name', 'email', 'password', 'status']);
 
         if (! $user || Hash::check($request->password, $user->password) == false) {
             return Controller::response(401, true, $message = 'Provided credentials are incorrect.');
@@ -76,7 +76,7 @@ class AuthController extends Controller
         $token       = $user->createToken($user->email, ['*'], $expiration);
         $user->token = $token->plainTextToken;
 
-        return Controller::response(200, true, $message = 'Login', $user);
+        return Controller::response(200, false, $message = 'Login', $user);
     }
     /**
      * @OA\Post(
