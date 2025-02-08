@@ -66,6 +66,7 @@ return new class extends Migration
             $table->foreign('id_module')->references('id_module')->on('modules');
             $table->foreign('id_role')->references('id_role')->on('modules_roles');
         });
+
     }
 
     /**

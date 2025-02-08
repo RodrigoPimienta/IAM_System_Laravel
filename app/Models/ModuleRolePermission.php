@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Carbon\Traits\LocalFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class ModuleRolePermission extends Model
 {
-    use LocalFactory;
+    use LocalFactory, HasApiTokens;
 
     protected $table = "modules_roles_permissions";
 
