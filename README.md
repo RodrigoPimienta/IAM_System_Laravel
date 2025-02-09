@@ -6,6 +6,8 @@ This project is an Identity and Access Management (IAM) system developed with La
 ## Technologies Used
 - Laravel 11
 - Sanctum (for API authentication)
+- Rate Limiting (Per IP and user)
+- CORS policy
 - SQLite (Database)
 - PHP 8+
 - Darkaonline/L5-Swagger (for API documentation)

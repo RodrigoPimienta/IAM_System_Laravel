@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('first_last_name')->nullable();
             $table->string('second_last_name')->nullable();
-            $table->string('status')->default(1); // Valor por defecto
+            $table->integer('status')->default(1); // Valor por defecto
         });
     }
 

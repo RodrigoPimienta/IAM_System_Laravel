@@ -69,7 +69,7 @@ class userController extends Controller implements HasMiddleware
 
     public function all(): object
     {
-        $users = User::all($this->columns);
+        $users = User::with('profile')->get($this->columns);
         return Controller::response(200, false, $message = 'User list', $users);
     }
 
