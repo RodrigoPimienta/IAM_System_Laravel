@@ -4,6 +4,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -25,6 +26,19 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => 'Not authenticated',
                     'data'    => null,
                 ], 401);
+            }
+            // Handle other exceptions or default response here
+            // return the exception message
+            return $e->getMessage();
+        });
+
+        $exceptions->render(function (ThrottleRequestsException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'error'   => true,
+                    'message' => 'Too many requests',
+                    'data'    => null,
+                ], 429);
             }
             // Handle other exceptions or default response here
             // return the exception message
